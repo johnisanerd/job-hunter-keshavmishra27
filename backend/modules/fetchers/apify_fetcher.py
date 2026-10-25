@@ -220,15 +220,15 @@ class ApifyIndeedFetcher(BaseApifyFetcher):
 
 class ApifyWellfoundFetcher(BaseApifyFetcher):
     source_name = "Wellfound"
-    ACTOR_ID = "radeance/wellfound-scraper"
+    ACTOR_ID = "johnvc/wellfound-jobs-api"
 
     async def fetch(self, keywords: list[str], location: str = "", **kwargs) -> list[RawJob]:
         results: list[RawJob] = []
         
         for keyword in keywords[:2]:
             run_input = {
-                "search": keyword,
-                "location": location or "India",
+                "keyword": keyword,
+                "locations": [location or "India"],
                 "maxItems": 30,
             }
             
@@ -242,18 +242,18 @@ class ApifyWellfoundFetcher(BaseApifyFetcher):
                 if isinstance(company, dict):
                     company = company.get("name", "Unknown")
                     
-                loc = item.get("location", "")
+                loc = ", ".join(item.get("locationNames") or [])
                 description = item.get("description", "")
                 apply_link = item.get("url") or item.get("jobUrl")
                 
                 mode = None
                 loc_lower = (loc or "").lower()
-                if "remote" in loc_lower or "work from home" in loc_lower:
+                if item.get("remote") or "remote" in loc_lower or "work from home" in loc_lower:
                     mode = "remote"
                 elif "hybrid" in loc_lower:
                     mode = "hybrid"
                     
-                salary = item.get("compensation", "") or item.get("salary", "")
+                salary = item.get("compensationRaw", "")
                 desc_parts = []
                 if salary:
                     desc_parts.append(f"Salary: {salary}")
