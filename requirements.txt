@@ -27,7 +27,7 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 email-validator==2.2.0
 
-apify-client==3.0.2
+apify-client==2.5.1
 tenacity==9.0.0
 loguru==0.7.3
 rich==13.9.4
